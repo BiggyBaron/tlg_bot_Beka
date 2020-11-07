@@ -19,18 +19,38 @@ import time
 
 
 client = MongoClient('mongodb://database:27017/')
-db = client.b2u
+db = client.bot
+col_names = db.list_collection_names()
+print(col_names)
+
+
 users = db['users']
-problems = db['problems']
-msgs = db['messages']
-dash = db['dash']
+u_log = db['log']
+messages = db['messages']
+settings = db['settings']
 
+if settings.find_one():
+    print()
+else:
+    default_settings = {
+            "ID админа": "Можно группы (в начале -), но в начале сделайте бота админом в группе",
+            "Hash бота": "Брать в botfather",
+            "Собирать контакты пользователей?": True,
+            "Текст для сообщения регистрации": "Пройдите регистрацию: укажите свой номер"
+            }
+    settings.insert_one(default_settings)
 
-bot = telebot.TeleBot("806603779:AAGXStpRxg5Gks5o2nUKh_JOYziZObKXoCs")
+setting = settings.find_one()
+
+bot = telebot.TeleBot(setting["Hash бота"])
 logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG)
-group_id = -1001438155243
+
+
+group_id = setting["ID админа"]
+collect_phone = setting["Собирать контакты пользователей?"]
+phone_collect_text = setting["Текст для сообщения регистрации"]
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -43,14 +63,11 @@ def send_welcome(message):
 
     user = {
         "user": str(message.chat.id),
-        "tlgfirstname": str(message.chat.first_name),
-        "tlglastname": str(message.chat.last_name),
-        "tlgusername": str(message.chat.username),
+        "firstname": str(message.chat.first_name),
+        "lastname": str(message.chat.last_name),
+        "username": str(message.chat.username),
         "registration": message.date,
         "phone": "",
-        "object": "",
-        "name": "",
-        "surname": ""
         }
     users.insert_one(user)
     
@@ -857,12 +874,6 @@ def text_handler(message):
         # endregion
     
     # endregion
-
-
-@bot.message_handler(content_types=['image'])
-def text_handler2(message):
-    bot.forward_message(group_id, message.chat.id, message.message_id)
-
 
 
 if __name__ == "__main__":

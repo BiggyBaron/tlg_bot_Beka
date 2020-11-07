@@ -1,7 +1,0 @@
-Flask
-requests
-pymongo
-flask_socketio
-gevent
-gevent-websocket
-flask_basicauth

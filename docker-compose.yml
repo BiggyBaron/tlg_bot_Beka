@@ -1,44 +1,11 @@
 version: "3"
 services:
-  log_bot:
+  tlg_bot:
     restart: always
-    build: ./log_bot
+    build: ./tlg_bot
     command: python3 -u ./main.py
     volumes:
       - .:/cleverest_machine
-    links:
-      - database
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "10"
-    depends_on:
-      - database
-
-  schedule_bot:
-    restart: always
-    build: ./schedule_bot
-    command: python3 -u ./main.py
-    volumes:
-      - .:/cleverest_machine
-    links:
-      - database
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "10"
-    depends_on:
-      - database
-      - log_bot
-  
-  dashboard:
-    restart: always
-    build: ./admin
-    command: python3 -u ./main.py
-    ports:
-      - "80:8080"
     links:
       - database
     logging:
@@ -52,7 +19,7 @@ services:
   database:
     restart: always
     # command: rm /data/db/mongod.lock
-    image: mongo:3.0.2
+    image: mongo
     volumes: 
       - ./.docker/mongodb/data/db/:/data/db/
     
@@ -63,9 +30,9 @@ services:
       - ME_CONFIG_MONGODB_SERVER=database
       - ME_CONFIG_MONGODB_PORT=27017
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-      - ME_CONFIG_MONGODB_AUTH_DATABASE=b2u
-      - ME_CONFIG_BASICAUTH_USERNAME=naboox
-      - ME_CONFIG_BASICAUTH_PASSWORD=The2ndlaw
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_BASICAUTH_USERNAME=Beka_is_best
+      - ME_CONFIG_BASICAUTH_PASSWORD=but_sometimes_Baur_lu4we
     ports:
       - "8080:8081"
     links:
